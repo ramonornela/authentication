@@ -1,5 +1,7 @@
 # AuthenticationModule
 
+This is abstract to Authentication based in project https://github.com/zendframework/zend-authentication
+
 ## Using AuthenticationModule or AuthenticationHttpModule in an Ionic 2 app
 
 ```typescript

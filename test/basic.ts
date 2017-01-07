@@ -1,5 +1,5 @@
 import 'jasmine';
-import { HttpPluginsIonicModule } from '../src';
+import { AuthenticationModule } from '../src';
 
 xdescribe('Make tests', () => {
 });

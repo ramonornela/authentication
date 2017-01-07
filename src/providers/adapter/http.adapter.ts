@@ -9,7 +9,7 @@ export const ConfigKeyAuth = 'authentication';
 
 export const ConfigKeyAdapter = 'http';
 
-export const HttpAdapterOptionsToken = new OpaqueToken('HTTPADAPTEROPTIONS'); 
+export const HttpAdapterOptionsToken = new OpaqueToken('HTTPADAPTEROPTIONS');
 
 export interface HttpAdapterOptions {
   [propName: string]: any;

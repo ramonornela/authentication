@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core'; 
+import { Injectable } from '@angular/core';
 import { Storage, WriteData } from './storage';
 
 const KeyId = '_authnoopersist';
 
 @Injectable()
 export class NonPersistent implements Storage {
-  
+
   private data: any = {};
 
   isEmpty(): boolean {

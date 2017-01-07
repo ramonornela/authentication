@@ -8,7 +8,7 @@ export class Authentication {
   constructor(
     @Optional() private storage: Storage,
     @Optional() private adapter: Adapter) {}
-  
+
   setStorage(storage: Storage): this {
     this.storage = storage;
     return this;

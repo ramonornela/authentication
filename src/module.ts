@@ -22,7 +22,7 @@ export class AuthenticationModule {
         { provide: Adapter, useExisting: adapter },
         { provide: Storage, useExisting: storage }
       ]
-    }
+    };
   }
 }
 
@@ -41,6 +41,6 @@ export class AuthenticationHttpModule {
       providers: [
         { provide: Storage, useExisting: storage }
       ]
-    }
+    };
   }
 }

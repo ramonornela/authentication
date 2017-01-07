@@ -75,7 +75,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ramonornela/http-plugins-ionic.git"
+    "url": "git+https://github.com/ramonornela/authentication.git"
   },
   "keywords": [
     "ionic",
@@ -89,7 +89,7 @@
   "author": "Ramon Ornelas <ramon.ornela@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ramonornela/http-plugins-ionic/issues"
+    "url": "https://github.com/ramonornela/authentication/issues"
   },
-  "homepage": "https://github.com/ramonornela/http-plugins-ionic"
+  "homepage": "https://github.com/ramonornela/authenticationc"
 }

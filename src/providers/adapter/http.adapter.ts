@@ -1,9 +1,9 @@
-import { Injectable , Inject, OpaqueToken, Optional } from '@angular/core';
+import { Inject, Injectable, OpaqueToken, Optional } from '@angular/core';
 import { Http } from '@angular/http';
 import { Config } from '@ramonornela/configuration';
 import { Resolve } from '@ramonornela/url-resolver';
-import { AdapterOptions } from './adapter.options';
 import { Result, ResultCode } from '../result';
+import { AdapterOptions } from './adapter.options';
 
 export const ConfigKeyAuth = 'authentication';
 

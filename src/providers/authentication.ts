@@ -1,7 +1,7 @@
 import { Injectable, Optional } from '@angular/core';
-import { Storage, LocalStorage } from './storage';
 import { Adapter } from './adapter';
 import { Result } from './result';
+import { LocalStorage, Storage } from './storage';
 
 @Injectable()
 export class Authentication {

@@ -167,8 +167,18 @@ export class HttpAdapter extends AdapterOptions {
      let params = this.bindParams();
      let url = this.resolve.url(this.url, params);
 
+     let options = this.requestOptions;
+
+     if (params) {
+       if (options.method.toUpperCase() === 'POST') {
+         optioms.body = params;
+       } else if (options.method.toUpperCase() === 'GET') {
+         optioms.search = params;
+       }
+     }
+
      return new Promise((resolve: any, reject: any) => {
-       this.http.request(url, this.requestOptions).subscribe((response) => {
+       this.http.request(url, options).subscribe((response) => {
          if (typeof this.callbackResolve === 'function') {
            resolve(this.callbackResolve.apply(this, [ response ]));
            return;

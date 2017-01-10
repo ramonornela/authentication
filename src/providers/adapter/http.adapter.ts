@@ -157,7 +157,7 @@ export class HttpAdapter extends AdapterOptions {
        delete options.callbackReject;
      }
 
-     this.setRequestOptions(options);
+     this.setRequestOptions(Object.assign({}, this.requestOptions, options));
 
      return this;
    }
@@ -198,6 +198,6 @@ export class HttpAdapter extends AdapterOptions {
    }
 
    protected createResultFailure(err: any): Result {
-     return new Result(ResultCode.FAILURE);
+     return new Result(ResultCode.FAILURE, null, err);
    }
 }

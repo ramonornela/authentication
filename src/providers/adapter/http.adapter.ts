@@ -167,13 +167,13 @@ export class HttpAdapter extends AdapterOptions {
      let params = this.bindParams();
      let url = this.resolve.url(this.url, params);
 
-     let options = this.requestOptions;
+     let options: any = this.requestOptions;
 
      if (params) {
        if (options.method.toUpperCase() === 'POST') {
-         optioms.body = params;
+         options.body = params;
        } else if (options.method.toUpperCase() === 'GET') {
-         optioms.search = params;
+         options.search = params;
        }
      }
 

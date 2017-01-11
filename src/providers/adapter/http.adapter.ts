@@ -1,5 +1,5 @@
 import { Inject, Injectable, OpaqueToken, Optional } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, URLSearchParams } from '@angular/http';
 import { Config } from '@ramonornela/configuration';
 import { Resolve } from '@ramonornela/url-resolver';
 import { Result, ResultCode } from '../result';
@@ -21,6 +21,7 @@ export interface HttpAdapterOptions {
   headers?: any;
   callbackResolve?: Function;
   callbackReject?: Function;
+  callbackBuildParams?: Function;
 }
 
 @Injectable()
@@ -37,6 +38,8 @@ export class HttpAdapter extends AdapterOptions {
    protected callbackResolve: Function;
 
    protected callbackReject: Function;
+
+   protected callbackBuildParams: Function;
 
    protected requestOptions: any = {
      method: 'POST'
@@ -112,6 +115,11 @@ export class HttpAdapter extends AdapterOptions {
      return this;
    }
 
+   setCallbackBuildParams(callback: Function): this {
+     this.callbackBuildParams = callback;
+     return this;
+   }
+
    setOptions(options: HttpAdapterOptions): this {
 
      this.setUrl(options.url);
@@ -157,6 +165,11 @@ export class HttpAdapter extends AdapterOptions {
        delete options.callbackReject;
      }
 
+     if (options.callbackBuildParams) {
+       this.setCallbackBuildParams(options.callbackBuildParams);
+       delete options.callbackBuildParams;
+     }
+
      this.setRequestOptions(Object.assign({}, this.requestOptions, options));
 
      return this;
@@ -169,11 +182,14 @@ export class HttpAdapter extends AdapterOptions {
 
      let options: any = this.requestOptions;
 
+     let callbackBuildParams = this.callbackBuildParams || this.buildParams;
+
      if (params) {
+       let buildParams = callbackBuildParams.apply(this, [ params ]);
        if (options.method.toUpperCase() === 'POST') {
-         options.body = params;
+         options.body = buildParams;
        } else if (options.method.toUpperCase() === 'GET') {
-         options.search = params;
+         options.search = buildParams;
        }
      }
 
@@ -201,6 +217,16 @@ export class HttpAdapter extends AdapterOptions {
      params[this.paramNameCredential] = this.getCredential();
 
      return params;
+   }
+
+   protected buildParams(params: any) {
+     let searchParams = new URLSearchParams('');
+
+     for (let param in params) {
+       searchParams.set(param, params[param]);
+     }
+
+     return searchParams;
    }
 
    protected createResultSuccess(response: any): Result {

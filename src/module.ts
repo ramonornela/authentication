@@ -4,6 +4,8 @@ import {
   Authentication,
   HttpAdapter,
   HttpAdapterOptionsToken,
+  LocalStorage,
+  NonPersistent,
   Storage
 } from './providers';
 
@@ -11,6 +13,8 @@ import {
   providers: [
     Authentication,
     HttpAdapter,
+    LocalStorage,
+    NonPersistent,
     { provide: HttpAdapterOptionsToken, useValue: null }
   ]
 })
@@ -30,6 +34,8 @@ export class AuthenticationModule {
   providers: [
     Authentication,
     HttpAdapter,
+    LocalStorage,
+    NonPersistent,
     { provide: Adapter, useClass: HttpAdapter },
     { provide: HttpAdapterOptionsToken, useValue: null }
   ]

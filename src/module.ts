@@ -15,7 +15,7 @@ import {
   ]
 })
 export class AuthenticationModule {
-  static initialize(adapter?: Adapter, storage?: Storage): ModuleWithProviders {
+  static initialize(adapter?: any, storage?: any): ModuleWithProviders {
     return {
       ngModule: AuthenticationModule,
       providers: [
@@ -35,7 +35,7 @@ export class AuthenticationModule {
   ]
 })
 export class AuthenticationHttpModule {
-  static initialize(storage?: Storage): ModuleWithProviders {
+  static initialize(storage?: any): ModuleWithProviders {
     return {
       ngModule: AuthenticationModule,
       providers: [

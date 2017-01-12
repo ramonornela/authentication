@@ -9,9 +9,9 @@ import {
 
 @NgModule({
   providers: [
-    { provide: HttpAdapterOptionsToken, useValue: null },
+    Authentication,
     HttpAdapter,
-    Authentication
+    { provide: HttpAdapterOptionsToken, useValue: null }
   ]
 })
 export class AuthenticationModule {
@@ -19,8 +19,8 @@ export class AuthenticationModule {
     return {
       ngModule: AuthenticationModule,
       providers: [
-        { provide: Adapter, useExisting: adapter },
-        { provide: Storage, useExisting: storage }
+        { provide: Adapter, useClass: adapter },
+        { provide: Storage, useClass: storage }
       ]
     };
   }
@@ -28,10 +28,10 @@ export class AuthenticationModule {
 
 @NgModule({
   providers: [
-    { provide: HttpAdapterOptionsToken, useValue: null },
+    Authentication,
     HttpAdapter,
     { provide: Adapter, useClass: HttpAdapter },
-    Authentication
+    { provide: HttpAdapterOptionsToken, useValue: null }
   ]
 })
 export class AuthenticationHttpModule {
@@ -39,7 +39,7 @@ export class AuthenticationHttpModule {
     return {
       ngModule: AuthenticationModule,
       providers: [
-        { provide: Storage, useExisting: storage }
+        { provide: Storage, useClass: storage }
       ]
     };
   }

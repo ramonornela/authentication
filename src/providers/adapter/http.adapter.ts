@@ -1,7 +1,7 @@
 import { Inject, Injectable, OpaqueToken, Optional } from '@angular/core';
 import { Http, URLSearchParams } from '@angular/http';
-import { Config } from '@ramonornela/configuration';
-import { Resolve } from '@ramonornela/url-resolver';
+import { Config } from '@mbamobi/configuration';
+import { Resolve } from '@mbamobi/url-resolver';
 import { Result, ResultCode } from '../result';
 import { AdapterOptions } from './adapter.options';
 

@@ -9,8 +9,8 @@ import { NgModule } from '@angular/core';
 import { IonicApp, IonicModule } from 'ionic-angular';
 import { MyApp } from './app.component';
 
-import { UrlResolverModule } from '@ramonornela/url-resolver';
-import { AuthenticationHttpModule } from '@ramonornela/authentication';
+import { UrlResolverModule } from '@mbamobi/url-resolver';
+import { AuthenticationHttpModule } from '@mbamobi/authentication';
 
 const Routes = {
   'auth': {
@@ -36,4 +36,4 @@ export class AppModule {}
 
 Contributing
 
-See [CONTRIBUTING.md](https://github.com/ramonornela/authentication/blob/master/.github/CONTRIBUTING.md)
+See [CONTRIBUTING.md](https://github.com/mbamobi/authentication/blob/master/.github/CONTRIBUTING.md)

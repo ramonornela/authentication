@@ -181,13 +181,8 @@ export class HttpAdapter extends AdapterOptions {
    }
 
    authenticate(): Promise<Result> {
-
      const params = this.bindParams();
-     let url = this.url;
-
-     if (this.resolve) {
-       url = this.resolve.url(this.url, params);
-     }
+     const url    = this.buildUrl(params);
 
      let options: any = this.requestOptions;
 
@@ -226,6 +221,16 @@ export class HttpAdapter extends AdapterOptions {
      params[this.paramNameCredential] = this.getCredential();
 
      return params;
+   }
+
+   protected buildUrl(params: Object, url?: string): string {
+     url = url || this.url;
+
+     if (this.resolve && this.resolve.getMetadata().has(url)) {
+       url = this.resolve.url(url, params);
+     }
+
+     return url;
    }
 
    protected buildParams(params: any) {

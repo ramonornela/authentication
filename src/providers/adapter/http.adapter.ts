@@ -200,16 +200,23 @@ export class HttpAdapter extends AdapterOptions {
      return new Promise((resolve: any, reject: any) => {
        this.http.request(url, options).subscribe((response) => {
          if (typeof this.callbackResolve === 'function') {
-           resolve(this.callbackResolve.apply(this, [ response ]));
+
+           const resultSuccess: any = this.callbackResolve.apply(this, [ response ]);
+           this.resultCallback(resultSuccess, resolve);
            return;
          }
-         resolve(this.createResultSuccess(response));
+
+         const resultSuccess: any = this.createResultSuccess(response);
+         this.resultCallback(resultSuccess, resolve);
        }, (err: any) => {
          if (typeof this.callbackReject === 'function') {
-           reject(this.callbackReject.apply(this, [ err ]));
+           const resultError: any = this.callbackReject.apply(this, [ err ]);
+           this.resultCallback(resultError, reject, false);
            return;
          }
-         reject(this.createResultFailure(err));
+
+         const resultError: any = this.createResultFailure(err);
+         this.resultCallback(resultError, reject, false);
        });
      });
    }
@@ -249,5 +256,26 @@ export class HttpAdapter extends AdapterOptions {
 
    protected createResultFailure(err: any): Result {
      return new Result(ResultCode.FAILURE, null, err);
+   }
+
+   protected resultCallback(result: any, callback: Function, success: boolean = true) {
+     if (result instanceof Result) {
+       callback(result);
+     }
+
+     if (result instanceof Promise) {
+       if (success) {
+         result.then((result: Result) => {
+          callback(result);
+        });
+
+        return;
+       }
+       result.catch((result: Result) => {
+        callback(result);
+      });
+     }
+
+     throw new Error('Return data type error');
    }
 }

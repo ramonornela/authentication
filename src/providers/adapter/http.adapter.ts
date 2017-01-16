@@ -202,21 +202,21 @@ export class HttpAdapter extends AdapterOptions {
          if (typeof this.callbackResolve === 'function') {
 
            const resultSuccess: any = this.callbackResolve.apply(this, [ response ]);
-           this.resultCallback(resultSuccess, resolve);
+           this.resultCallback(resultSuccess, resolve, reject);
            return;
          }
 
          const resultSuccess: any = this.createResultSuccess(response);
-         this.resultCallback(resultSuccess, resolve);
+         this.resultCallback(resultSuccess, resolve, reject);
        }, (err: any) => {
          if (typeof this.callbackReject === 'function') {
            const resultError: any = this.callbackReject.apply(this, [ err ]);
-           this.resultCallback(resultError, reject, false);
+           this.resultCallback(resultError, null, reject);
            return;
          }
 
          const resultError: any = this.createResultFailure(err);
-         this.resultCallback(resultError, reject, false);
+         this.resultCallback(resultError, null, reject);
        });
      });
    }
@@ -258,22 +258,23 @@ export class HttpAdapter extends AdapterOptions {
      return new Result(ResultCode.FAILURE, null, err);
    }
 
-   protected resultCallback(result: any, callback: Function, success: boolean = true) {
+   protected resultCallback(result: any, resolve: Function, reject: Function) {
      if (result instanceof Result) {
-       callback(result);
+       resolve(result);
      }
 
      if (result instanceof Promise) {
-       if (success) {
-         result.then((result: Result) => {
-          callback(result);
+       if (resolve) {
+         result = result.then((data: Result) => {
+          resolve(data);
         });
-
-        return;
        }
-       result.catch((result: Result) => {
-        callback(result);
-      });
+
+       if (reject) {
+         result.catch((err: Result) => {
+          reject(err);
+        });
+       }
      }
 
      throw new Error('Return data type error');

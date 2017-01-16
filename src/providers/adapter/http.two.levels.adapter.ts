@@ -1,5 +1,5 @@
 import { Inject, Injectable, Optional } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 import { Config } from '@mbamobi/configuration';
 import { Resolve } from '@mbamobi/url-resolver';
 import 'rxjs/add/operator/toPromise';
@@ -35,9 +35,9 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     return this;
   }
 
-  setCallbackResolve(callback: Function): this {
-     throw new Error('Not allowed');
-   }
+  setCallbackResolve(): this {
+    throw new Error('Not allowed');
+  }
 
   setOptions(options: HttpAdapterTwoLevelsOptions): this {
 
@@ -55,12 +55,14 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     return this;
   }
 
-  protected createResultSuccess(response: any): Promise<Result> {
+  protected createResultSuccess(): Promise<Result> {
     const url = this.buildUrl(this.params2, this.url2);
 
     return new Promise((resolve, reject) => {
-      this.http.request(url).subscribe((response) => {
-        resolve(new Result(ResultCode.SUCCESS, this.getIdentity(), response.json() || response.body()));
+      this.http.request(url).subscribe((response: Response) => {
+        resolve(new Result(ResultCode.SUCCESS, this.getIdentity(), response.json()));
+      }, () => {
+        reject();
       });
     });
   }

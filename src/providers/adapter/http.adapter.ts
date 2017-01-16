@@ -138,6 +138,11 @@ export class HttpAdapter extends AdapterOptions {
      if (options.method) {
        this.setMethod(options.method);
        delete options.method;
+     } else if (this.resolve) {
+       const method = this.resolve.getMetadata().getMethod(this.url);
+       if (method) {
+         this.setMethod(method);
+       }
      }
 
      if (options.params) {

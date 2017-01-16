@@ -191,7 +191,7 @@ export class HttpAdapter extends AdapterOptions {
 
      let options: any = this.requestOptions;
 
-     let callbackBuildParams = this.callbackBuildParams || this.buildParams;
+     const callbackBuildParams = this.callbackBuildParams || this.buildParams;
 
      if (params) {
        let buildParams = callbackBuildParams.apply(this, [ params ]);
@@ -229,7 +229,7 @@ export class HttpAdapter extends AdapterOptions {
    }
 
    protected buildParams(params: any) {
-     let searchParams = new URLSearchParams('');
+     const searchParams = new URLSearchParams('');
 
      for (let param in params) {
        searchParams.set(param, params[param]);

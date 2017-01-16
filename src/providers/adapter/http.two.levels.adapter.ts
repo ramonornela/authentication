@@ -55,15 +55,19 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     return this;
   }
 
-  protected createResultSuccess(): Promise<Result> {
+  protected createResultSuccess(response: Response): Promise<Result> {
     const url = this.buildUrl(this.params2, this.url2);
 
     return new Promise((resolve, reject) => {
-      this.http.request(url).subscribe((response: Response) => {
-        resolve(new Result(ResultCode.SUCCESS, this.getIdentity(), response.json()));
-      }, () => {
-        reject();
+      this.http.request(url).subscribe((response2: Response) => {
+        resolve(new Result(ResultCode.SUCCESS, this.getIdentity(), response2.json(), response.json()));
+      }, (err) => {
+        reject(this.createFailure(err));
       });
     });
+  }
+
+  protected createFailure(err: Response) {
+    return new Result(ResultCode.FAILURE, this.getIdentity(), err.json());
   }
 }

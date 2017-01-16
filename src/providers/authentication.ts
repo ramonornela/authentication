@@ -87,4 +87,14 @@ export class Authentication {
 
     return storage.read().data;
   }
+
+  getDataExtra() {
+    let storage = this.getStorage();
+
+    if (storage.isEmpty()) {
+      return;
+    }
+
+    return storage.read().dataExtra;
+  }
 }

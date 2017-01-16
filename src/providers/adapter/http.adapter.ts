@@ -47,7 +47,7 @@ export class HttpAdapter extends AdapterOptions {
 
    constructor(
      protected http: Http,
-     protected resolve: Resolve,
+     @Optional() protected resolve: Resolve,
      @Optional() config: Config,
      @Optional() @Inject(HttpAdapterOptionsToken) options: any
    ) {
@@ -148,8 +148,8 @@ export class HttpAdapter extends AdapterOptions {
      if (options.headers) {
        this.setHeaders(options.headers);
        delete options.headers;
-     } else {
-       let headers = this.resolve.getMetadata().getHeaders(this.url);
+     } else if (this.resolve) {
+       const headers = this.resolve.getMetadata().getHeaders(this.url);
        if (headers) {
          this.setHeaders(headers);
        }
@@ -177,8 +177,12 @@ export class HttpAdapter extends AdapterOptions {
 
    authenticate(): Promise<Result> {
 
-     let params = this.bindParams();
-     let url = this.resolve.url(this.url, params);
+     const params = this.bindParams();
+     let url = this.url;
+
+     if (this.resolve) {
+       url = this.resolve.url(this.url, params);
+     }
 
      let options: any = this.requestOptions;
 

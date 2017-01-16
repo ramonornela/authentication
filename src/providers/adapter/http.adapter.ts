@@ -250,11 +250,11 @@ export class HttpAdapter extends AdapterOptions {
      return searchParams;
    }
 
-   protected createResultSuccess(response: any): Result {
+   protected createResultSuccess(response: any): Promise<Result> | Result {
      return new Result(ResultCode.SUCCESS, this.getIdentity(), response.json() || response.body());
    }
 
-   protected createResultFailure(err: any): Result {
+   protected createResultFailure(err: any): Promise<Result> | Result {
      return new Result(ResultCode.FAILURE, null, err);
    }
 

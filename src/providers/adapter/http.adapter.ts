@@ -246,6 +246,7 @@ export class HttpAdapter extends AdapterOptions {
    protected resultCallback(result: any, resolve: Function, reject: Function) {
      if (result instanceof Result) {
        resolve(result);
+       return;
      }
 
      if (result instanceof Promise) {
@@ -260,6 +261,12 @@ export class HttpAdapter extends AdapterOptions {
           reject(err);
         });
        }
+
+       if (!resolve && !reject) {
+         throw new Error('Need info resolve or reject');
+       }
+
+       return;
      }
 
      throw new Error('Return data type error');

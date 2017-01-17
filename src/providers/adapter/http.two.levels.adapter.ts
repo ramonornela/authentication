@@ -18,6 +18,7 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
   protected url2: string;
   protected params2: Object;
   protected requestOptions2: any;
+  protected preRequestCallback: Function;
 
   constructor(
     http: Http,
@@ -38,15 +39,20 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     return this;
   }
 
+  setPreRequestCallback(callback: Function): this {
+    this.preRequestCallback = callback;
+    return this;
+  }
+
   setParams2(params: Object): this {
     this.params2 = params;
     return this;
   }
 
   setRequestOptions2(options: any): this {
-     this.requestOptions2 = options;
-     return this;
-   }
+    this.requestOptions2 = options;
+    return this;
+  }
 
   setCallbackResolve(): this {
     throw new Error('Not allowed');
@@ -57,7 +63,8 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     this.setUrl2(options.url2);
 
     this.setOption(options, 'params2')
-        .setOption(options, 'method2', true);
+        .setOption(options, 'method2', true)
+        .setOption(options, 'preRequestCallback');
 
     this.setRequestOptions2(Object.assign({}, this.requestOptions2, options));
 
@@ -66,6 +73,10 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
   }
 
   protected createResultSuccess(response: Response): Promise<Result> {
+    if (this.preRequestCallback) {
+      this.preRequestCallback.apply(this, [ response ]);
+    }
+
     const url = this.buildUrl(this.params2, this.url2);
 
     let options: any = this.requestOptions2;

@@ -64,7 +64,7 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     this.setUrl2(options.url2);
 
     this.setOption(options, 'params2')
-        .setOption(options, 'method2', true)
+        .setOption(options, 'method2', true, 'method', this.url2)
         .setOption(options, 'preRequestCallback');
 
     this.setRequestOptions2(Object.assign({}, this.requestOptions2, options));

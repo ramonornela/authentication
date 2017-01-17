@@ -120,16 +120,22 @@ export class HttpAdapter extends AdapterOptions {
      return this;
    }
 
-   protected setOption(options: Object, option: string, resolve: boolean = false) {
+   protected setOption(options: Object, property: string, resolve: boolean = false, option?: string, id?: string) {
+     if (!option) {
+       option = property;
+     }
+
+     id = id || this.url;
+
      const setMethod = [
        'set',
        option.charAt(0).toUpperCase(),
        option.substr(1)
      ].join('');
 
-     if (options[option]) {
-       this[setMethod](options[option]);
-       delete options[option];
+     if (options[property]) {
+       this[setMethod](options[property]);
+       delete options[property];
      } if (resolve && this.resolve) {
        const getMethodResolve = [
          'get',
@@ -137,7 +143,7 @@ export class HttpAdapter extends AdapterOptions {
          option.substr(1)
        ].join('');
 
-       const value = this.resolve.getMetadata()[getMethodResolve](this.url);
+       const value = this.resolve.getMetadata()[getMethodResolve](id);
        if (value) {
          this[setMethod](value);
        }

@@ -158,7 +158,7 @@ export class HttpAdapter extends AdapterOptions {
          .setOption(options, 'headers', true)
          .setOption(options, 'callbackResolve')
          .setOption(options, 'callbackReject')
-         .setOption(options, 'callbackBuildParams')
+         .setOption(options, 'callbackBuildParams');
 
      this.setRequestOptions(Object.assign({}, this.requestOptions, options));
 

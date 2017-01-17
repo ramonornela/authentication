@@ -120,60 +120,45 @@ export class HttpAdapter extends AdapterOptions {
      return this;
    }
 
+   protected setOption(options: Object, option: string, resolve: boolean = false) {
+     const setMethod = [
+       'set',
+       option.charAt(0).toUpperCase(),
+       option.substr(1)
+     ].join('');
+
+     if (options[option]) {
+       this[setMethod](options[option]);
+       delete options[option];
+     } if (resolve && this.resolve) {
+       const getMethodResolve = [
+         'get',
+         option.charAt(0).toUpperCase(),
+         option.substr(1)
+       ].join('');
+
+       const value = this.resolve.getMetadata()[getMethodResolve](this.url);
+       if (value) {
+         this[setMethod](value);
+       }
+     }
+
+     return this;
+   }
+
    setOptions(options: HttpAdapterOptions): this {
 
      this.setUrl(options.url);
      delete options.url;
 
-     if (options.paramNameIdentity) {
-       this.setParamNameIdentity(options.paramNameIdentity);
-       delete options.paramNameIdentity;
-     }
-
-     if (options.paramNameCredential) {
-       this.setParamNameCredential(options.paramNameCredential);
-       delete options.paramNameCredential;
-     }
-
-     if (options.method) {
-       this.setMethod(options.method);
-       delete options.method;
-     } else if (this.resolve) {
-       const method = this.resolve.getMetadata().getMethod(this.url);
-       if (method) {
-         this.setMethod(method);
-       }
-     }
-
-     if (options.params) {
-       this.setParams(options.params);
-       delete options.params;
-     }
-
-     if (options.headers) {
-       this.setHeaders(options.headers);
-       delete options.headers;
-     } else if (this.resolve) {
-       const headers = this.resolve.getMetadata().getHeaders(this.url);
-       if (headers) {
-         this.setHeaders(headers);
-       }
-     }
-
-     if (options.callbackResolve) {
-       this.setCallbackResolve(options.callbackResolve);
-       delete options.callbackResolve;
-     }
-
-     if (options.callbackReject) {
-       this.setCallbackReject(options.callbackReject);
-       delete options.callbackReject;
-     }
-
-     if (options.callbackBuildParams) {
-       this.setCallbackBuildParams(options.callbackBuildParams);
-       delete options.callbackBuildParams;
-     }
+     this.setOption(options, 'paramNameIdentity')
+         .setOption(options, 'paramNameCredential')
+         .setOption(options, 'method', true)
+         .setOption(options, 'params')
+         .setOption(options, 'headers', true)
+         .setOption(options, 'callbackResolve')
+         .setOption(options, 'callbackReject')
+         .setOption(options, 'callbackBuildParams')
 
      this.setRequestOptions(Object.assign({}, this.requestOptions, options));
 
@@ -189,7 +174,7 @@ export class HttpAdapter extends AdapterOptions {
      const callbackBuildParams = this.callbackBuildParams || this.buildParams;
 
      if (params) {
-       let buildParams = callbackBuildParams.apply(this, [ params ]);
+       const buildParams = callbackBuildParams.apply(this, [ params ]);
        if (options.method.toUpperCase() === 'POST') {
          options.body = buildParams;
        } else if (options.method.toUpperCase() === 'GET') {

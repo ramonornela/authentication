@@ -7,14 +7,17 @@ import { Result, ResultCode } from '../result';
 import { HttpAdapter, HttpAdapterOptions, HttpAdapterOptionsToken } from './http.adapter';
 
 export interface HttpAdapterTwoLevelsOptions extends HttpAdapterOptions {
+  method2: string;
   url2: string;
   params2?: Object;
 }
 
 @Injectable()
 export class HttpTwoLevelsAdapter extends HttpAdapter {
+  protected method2: string;
   protected url2: string;
   protected params2: Object;
+  protected requestOptions2: any;
 
   constructor(
     http: Http,
@@ -40,16 +43,18 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     return this;
   }
 
+  setRequestOptions2(options: any): this {
+     this.requestOptions2 = options;
+     return this;
+   }
+
   setCallbackResolve(): this {
     throw new Error('Not allowed');
   }
 
   setOptions(options: HttpAdapterTwoLevelsOptions): this {
 
-    if (options.url2) {
-      this.setUrl2(options.url2);
-      delete options.url2;
-    }
+    this.setUrl2(options.url2);
 
     if (options.params2) {
       this.setParams2(options.params2);
@@ -73,8 +78,20 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
   protected createResultSuccess(response: Response): Promise<Result> {
     const url = this.buildUrl(this.params2, this.url2);
 
+    let options: any = this.requestOptions2;
+    const callbackBuildParams = this.callbackBuildParams || this.buildParams;
+
+    if (this.params2) {
+      const buildParams = callbackBuildParams.apply(this, [ this.params2 ]);
+      if (options.method.toUpperCase() === 'POST') {
+        options.body = buildParams;
+      } else if (options.method.toUpperCase() === 'GET') {
+        options.search = buildParams;
+      }
+    }
+
     return new Promise((resolve, reject) => {
-      this.http.request(url).subscribe((response2: Response) => {
+      this.http.request(url, options).subscribe((response2: Response) => {
         resolve(new Result(ResultCode.SUCCESS, this.getIdentity(), response2.json(), response.json()));
       }, (err) => {
         reject(this.createFailure(err));

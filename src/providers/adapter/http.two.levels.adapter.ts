@@ -56,20 +56,10 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
 
     this.setUrl2(options.url2);
 
-    if (options.params2) {
-      this.setParams2(options.params2);
-      delete options.params2;
-    }
+    this.setOption(options, 'params2')
+        .setOption(options, 'method2', true);
 
-    if (options.method2) {
-      this.setMethod2(options.method2);
-      delete options.method2;
-    } else if (this.resolve) {
-       const method = this.resolve.getMetadata().getMethod(this.url2);
-       if (method) {
-         this.setMethod2(method);
-       }
-    }
+    this.setRequestOptions2(Object.assign({}, this.requestOptions2, options));
 
     super.setOptions(options);
     return this;

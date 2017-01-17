@@ -251,7 +251,18 @@ export class HttpAdapter extends AdapterOptions {
 
    protected resultCallback(result: any, resolve: Function, reject: Function) {
      if (result instanceof Result) {
-       resolve(result);
+       if (resolve) {
+         resolve(result);
+       }
+
+       if (reject) {
+         reject(result);
+       }
+
+       if (!resolve && !reject) {
+         throw new Error('Need info resolve or reject');
+       }
+
        return;
      }
 

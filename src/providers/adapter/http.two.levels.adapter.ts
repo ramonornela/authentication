@@ -30,6 +30,11 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     return this;
   }
 
+  setMethod2(method: string): this {
+    this.method2 = method;
+    return this;
+  }
+
   setParams2(params: Object): this {
     this.params2 = params;
     return this;
@@ -49,6 +54,16 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
     if (options.params2) {
       this.setParams2(options.params2);
       delete options.params2;
+    }
+
+    if (options.method2) {
+      this.setMethod2(options.method2);
+      delete options.method2;
+    } else if (this.resolve) {
+       const method = this.resolve.getMetadata().getMethod(this.url2);
+       if (method) {
+         this.setMethod2(method);
+       }
     }
 
     super.setOptions(options);

@@ -10,6 +10,7 @@ export interface HttpAdapterTwoLevelsOptions extends HttpAdapterOptions {
   method2: string;
   url2: string;
   params2?: Object;
+  preRequestCallback?: Function;
 }
 
 @Injectable()

@@ -109,6 +109,6 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
   }
 
   protected createFailure(err: Response) {
-    return new Result(ResultCode.FAILURE, this.getIdentity(), err.json());
+    return new Result(ResultCode.FAILURE, this.getIdentity(), err);
   }
 }

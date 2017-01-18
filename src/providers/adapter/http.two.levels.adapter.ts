@@ -17,6 +17,7 @@ export interface HttpAdapterTwoLevelsOptions extends HttpAdapterOptions {
 export class HttpTwoLevelsAdapter extends HttpAdapter {
   protected method2: string;
   protected url2: string;
+  protected headers2: Object;
   protected params2: Object;
   protected requestOptions2: any;
   protected preRequestCallback: Function;
@@ -37,6 +38,11 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
 
   setMethod2(method: string): this {
     this.method2 = method;
+    return this;
+  }
+
+  setHeaders2(headers: Object): this {
+    this.requestOptions2.headers = headers;
     return this;
   }
 
@@ -65,6 +71,7 @@ export class HttpTwoLevelsAdapter extends HttpAdapter {
 
     this.setOption(options, 'params2')
         .setOption(options, 'method2', true, 'method', this.url2)
+        .setOption(options, 'headers2', true, 'headers', this.url2)
         .setOption(options, 'preRequestCallback');
 
     this.setRequestOptions2(Object.assign({}, this.requestOptions2, options));

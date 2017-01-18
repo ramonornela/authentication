@@ -27,6 +27,6 @@ export class LocalStorage implements Storage {
   }
 
   clear(): void {
-    localStorage.setItem(this.id, null);
+    localStorage.removeItem(this.id);
   }
 }

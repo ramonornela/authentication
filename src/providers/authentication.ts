@@ -50,7 +50,7 @@ export class Authentication {
           this.getStorage().write({
             identity: result.getIdentity(),
             data: result.getData(),
-            dataExtra: result.getDataExtra()
+            dataExtra: result.getExtra()
           });
           resolve(result);
         }

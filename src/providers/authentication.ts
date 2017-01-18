@@ -49,7 +49,8 @@ export class Authentication {
         if (result.isValid()) {
           this.getStorage().write({
             identity: result.getIdentity(),
-            data: result.getData()
+            data: result.getData(),
+            dataExtra: result.getDataExtra()
           });
           resolve(result);
         }

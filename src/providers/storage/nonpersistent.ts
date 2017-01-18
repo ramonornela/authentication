@@ -5,7 +5,6 @@ export const NonPersistentId = '_authlocalstorage';
 
 export const NonPersistentIdToken = new OpaqueToken('NONPERSISTIDTOKEN');
 
-
 @Injectable()
 export class NonPersistent implements Storage {
 

@@ -15,7 +15,7 @@ export class LocalStorage implements Storage {
   }
 
   isEmpty() {
-    return localStorage.getItem(this.id) === null;
+    return localStorage.getItem(this.id) === null || localStorage.getItem(this.id) === 'null';
   }
 
   write(data: WriteData): void {

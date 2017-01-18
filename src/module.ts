@@ -5,7 +5,9 @@ import {
   HttpAdapter,
   HttpAdapterOptionsToken,
   LocalStorage,
+  LocalStorageIdToken,
   NonPersistent,
+  NonPersistentIdToken,
   Storage
 } from './providers';
 
@@ -18,7 +20,9 @@ export class AuthenticationModule {
         Authentication,
         HttpAdapter,
         LocalStorage,
+        { provide: LocalStorageIdToken, useValue: null },
         NonPersistent,
+        { provide: NonPersistentIdToken, useValue: null },
         { provide: HttpAdapterOptionsToken, useValue: null },
         { provide: Adapter, useClass: adapter },
         { provide: Storage, useClass: storage }
@@ -36,7 +40,9 @@ export class AuthenticationHttpModule {
         Authentication,
         HttpAdapter,
         LocalStorage,
+        { provide: LocalStorageIdToken, useValue: null },
         NonPersistent,
+        { provide: NonPersistentIdToken, useValue: null },
         { provide: Adapter, useClass: HttpAdapter },
         { provide: HttpAdapterOptionsToken, useValue: null },
         { provide: Storage, useClass: storage },

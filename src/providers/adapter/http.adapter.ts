@@ -231,7 +231,7 @@ export class HttpAdapter extends AdapterOptions {
      return url;
    }
 
-   protected buildParams(params: any) {
+   protected buildParams(params: any): any {
      const searchParams = new URLSearchParams('');
 
      for (let param in params) {

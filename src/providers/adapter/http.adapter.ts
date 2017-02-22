@@ -2,12 +2,12 @@ import { Inject, Injectable, OpaqueToken, Optional } from '@angular/core';
 import { Http, URLSearchParams } from '@angular/http';
 import { Config } from '@mbamobi/configuration';
 import { Resolve } from '@mbamobi/url-resolver';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/operator/timeoutWith';
+import { Observable } from 'rxjs/Observable';
 import { Result, ResultCode } from '../result';
 import { AdapterOptions } from './adapter.options';
 import { TimeoutException } from './exception';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/defer';
-import 'rxjs/add/operator/timeoutWith';
 
 export const ConfigKeyAuth = 'authentication';
 
@@ -202,8 +202,8 @@ export class HttpAdapter extends AdapterOptions {
      }
 
      return new Promise((resolve: any, reject: any) => {
-       let observable = this.http.request(url, options); 
-       
+       let observable = this.http.request(url, options);
+
        if (this.timeout) {
          observable = observable.timeoutWith(this.timeout, Observable.defer(() => {
            let err = new TimeoutException();

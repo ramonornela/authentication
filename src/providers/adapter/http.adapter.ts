@@ -4,6 +4,10 @@ import { Config } from '@mbamobi/configuration';
 import { Resolve } from '@mbamobi/url-resolver';
 import { Result, ResultCode } from '../result';
 import { AdapterOptions } from './adapter.options';
+import { TimeoutException } from './exception';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/operator/timeoutWith';
 
 export const ConfigKeyAuth = 'authentication';
 
@@ -16,6 +20,7 @@ export interface HttpAdapterOptions {
   url: string;
   paramNameIdentity?: string;
   paramNameCredential?: string;
+  timeout?:  number;
   method?: string;
   params?: Object;
   headers?: any;
@@ -28,6 +33,8 @@ export interface HttpAdapterOptions {
 export class HttpAdapter extends AdapterOptions {
 
    protected url: string;
+
+   protected timeout: number;
 
    protected params: Object = {};
 
@@ -72,6 +79,11 @@ export class HttpAdapter extends AdapterOptions {
 
    setUrl(url: string): this {
      this.url = url;
+     return this;
+   }
+
+   setTimeout(timeout: number): this {
+     this.timeout = timeout;
      return this;
    }
 
@@ -160,6 +172,7 @@ export class HttpAdapter extends AdapterOptions {
      this.setOption(options, 'paramNameIdentity')
          .setOption(options, 'paramNameCredential')
          .setOption(options, 'method', true)
+         .setOption(options, 'timeout')
          .setOption(options, 'params')
          .setOption(options, 'headers', true)
          .setOption(options, 'callbackResolve')
@@ -189,27 +202,43 @@ export class HttpAdapter extends AdapterOptions {
      }
 
      return new Promise((resolve: any, reject: any) => {
-       this.http.request(url, options).subscribe((response) => {
-         if (typeof this.callbackResolve === 'function') {
+       let observable = this.http.request(url, options); 
+       
+       if (this.timeout) {
+         observable = observable.timeoutWith(this.timeout, Observable.defer(() => {
+           let err = new TimeoutException();
+           return Observable.throw(err);
+         }));
+       }
 
-           const resultSuccess: any = this.callbackResolve.apply(this, [ response ]);
-           this.resultCallback(resultSuccess, resolve, reject);
-           return;
-         }
-
-         const resultSuccess: any = this.createResultSuccess(response);
-         this.resultCallback(resultSuccess, resolve, reject);
+       observable.subscribe((response) => {
+         this.responseSuccess(response, resolve, reject);
        }, (err: any) => {
-         if (typeof this.callbackReject === 'function') {
-           const resultError: any = this.callbackReject.apply(this, [ err ]);
-           this.resultCallback(resultError, null, reject);
-           return;
-         }
-
-         const resultError: any = this.createResultFailure(err);
-         this.resultCallback(resultError, null, reject);
+         this.responseError(err, reject);
        });
      });
+   }
+
+   protected responseSuccess(response: any, resolve: any, reject: any) {
+     if (typeof this.callbackResolve === 'function') {
+       const resultSuccess: any = this.callbackResolve.apply(this, [ response ]);
+       this.resultCallback(resultSuccess, resolve, reject);
+       return;
+     }
+
+     const resultSuccess: any = this.createResultSuccess(response);
+     this.resultCallback(resultSuccess, resolve, reject);
+   }
+
+   protected responseError(err: any, reject: any) {
+     if (typeof this.callbackReject === 'function') {
+       const resultError: any = this.callbackReject.apply(this, [ err ]);
+       this.resultCallback(resultError, null, reject);
+       return;
+     }
+
+     const resultError: any = this.createResultFailure(err);
+     this.resultCallback(resultError, null, reject);
    }
 
    protected bindParams(): Object {

@@ -1,6 +1,6 @@
 {
   "name": "@mbamobi/authentication",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "This is abstract to Authentication based in project https://github.com/zendframework/zend-authentication",
   "main": "dist/umd/index.js",
   "typings": "dist/esm/index.d.ts",

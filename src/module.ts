@@ -25,7 +25,7 @@ export class AuthenticationModule {
         { provide: NonPersistentIdToken, useValue: null },
         { provide: HttpAdapterOptionsToken, useValue: null },
         { provide: Adapter, useClass: adapter },
-        { provide: Storage, useClass: storage }
+        { provide: Storage, useClass: storage || LocalStorage }
       ]
     };
   }
@@ -45,7 +45,7 @@ export class AuthenticationHttpModule {
         { provide: NonPersistentIdToken, useValue: null },
         { provide: Adapter, useClass: HttpAdapter },
         { provide: HttpAdapterOptionsToken, useValue: null },
-        { provide: Storage, useClass: storage },
+        { provide: Storage, useClass: storage || LocalStorage },
       ]
     };
   }

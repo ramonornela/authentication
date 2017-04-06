@@ -1,3 +1,14 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/mbamobi/authentication/compare/v1.0.0...v2.0.0) (2017-04-06)
+
+
+### Bug Fixes
+
+* **module:** assign storage default ([2d8992a](https://github.com/mbamobi/authentication/commit/2d8992a))
+* **module:** useClass null to adapter ([98caa55](https://github.com/mbamobi/authentication/commit/98caa55))
+
+
+
 <a name="1.0.0"></a>
 # 1.0.0 (2017-04-06)
 

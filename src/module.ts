@@ -24,7 +24,7 @@ export class AuthenticationModule {
         NonPersistent,
         { provide: NonPersistentIdToken, useValue: null },
         { provide: HttpAdapterOptionsToken, useValue: null },
-        { provide: Adapter, useClass: adapter },
+        { provide: Adapter, useClass: adapter || HttpAdapter },
         { provide: Storage, useClass: storage || LocalStorage }
       ]
     };

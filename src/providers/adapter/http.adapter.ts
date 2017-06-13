@@ -1,9 +1,13 @@
 import { Inject, Injectable, OpaqueToken, Optional } from '@angular/core';
 import { Http, URLSearchParams } from '@angular/http';
-import { Config } from '@ramonornela/configuration';
-import { Resolve } from '@ramonornela/url-resolver';
+import { Config } from '@mbamobi/configuration';
+import { Resolve } from '@mbamobi/url-resolver';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/operator/timeoutWith';
+import { Observable } from 'rxjs/Observable';
 import { Result, ResultCode } from '../result';
 import { AdapterOptions } from './adapter.options';
+import { TimeoutException } from './exception';
 
 export const ConfigKeyAuth = 'authentication';
 
@@ -16,6 +20,7 @@ export interface HttpAdapterOptions {
   url: string;
   paramNameIdentity?: string;
   paramNameCredential?: string;
+  timeout?:  number;
   method?: string;
   params?: Object;
   headers?: any;
@@ -28,6 +33,8 @@ export interface HttpAdapterOptions {
 export class HttpAdapter extends AdapterOptions {
 
    protected url: string;
+
+   protected timeout: number;
 
    protected params: Object = {};
 
@@ -47,7 +54,7 @@ export class HttpAdapter extends AdapterOptions {
 
    constructor(
      protected http: Http,
-     protected resolve: Resolve,
+     @Optional() protected resolve: Resolve,
      @Optional() config: Config,
      @Optional() @Inject(HttpAdapterOptionsToken) options: any
    ) {
@@ -72,6 +79,11 @@ export class HttpAdapter extends AdapterOptions {
 
    setUrl(url: string): this {
      this.url = url;
+     return this;
+   }
+
+   setTimeout(timeout: number): this {
+     this.timeout = timeout;
      return this;
    }
 
@@ -120,55 +132,52 @@ export class HttpAdapter extends AdapterOptions {
      return this;
    }
 
+   protected setOption(options: Object, property: string, resolve: boolean = false, option?: string, id?: string) {
+     if (!option) {
+       option = property;
+     }
+
+     id = id || this.url;
+
+     const setMethod = [
+       'set',
+       option.charAt(0).toUpperCase(),
+       option.substr(1)
+     ].join('');
+
+     if (options[property]) {
+       this[setMethod](options[property]);
+       delete options[property];
+     } if (resolve && this.resolve) {
+       const getMethodResolve = [
+         'get',
+         option.charAt(0).toUpperCase(),
+         option.substr(1)
+       ].join('');
+
+       const value = this.resolve.getMetadata()[getMethodResolve](id);
+       if (value) {
+         this[setMethod](value);
+       }
+     }
+
+     return this;
+   }
+
    setOptions(options: HttpAdapterOptions): this {
 
      this.setUrl(options.url);
      delete options.url;
 
-     if (options.paramNameIdentity) {
-       this.setParamNameIdentity(options.paramNameIdentity);
-       delete options.paramNameIdentity;
-     }
-
-     if (options.paramNameCredential) {
-       this.setParamNameCredential(options.paramNameCredential);
-       delete options.paramNameCredential;
-     }
-
-     if (options.method) {
-       this.setMethod(options.method);
-       delete options.method;
-     }
-
-     if (options.params) {
-       this.setParams(options.params);
-       delete options.params;
-     }
-
-     if (options.headers) {
-       this.setHeaders(options.headers);
-       delete options.headers;
-     } else {
-       let headers = this.resolve.getMetadata().getHeaders(this.url);
-       if (headers) {
-         this.setHeaders(headers);
-       }
-     }
-
-     if (options.callbackResolve) {
-       this.setCallbackResolve(options.callbackResolve);
-       delete options.callbackResolve;
-     }
-
-     if (options.callbackReject) {
-       this.setCallbackReject(options.callbackReject);
-       delete options.callbackReject;
-     }
-
-     if (options.callbackBuildParams) {
-       this.setCallbackBuildParams(options.callbackBuildParams);
-       delete options.callbackBuildParams;
-     }
+     this.setOption(options, 'paramNameIdentity')
+         .setOption(options, 'paramNameCredential')
+         .setOption(options, 'method', true)
+         .setOption(options, 'timeout')
+         .setOption(options, 'params')
+         .setOption(options, 'headers', true)
+         .setOption(options, 'callbackResolve')
+         .setOption(options, 'callbackReject')
+         .setOption(options, 'callbackBuildParams');
 
      this.setRequestOptions(Object.assign({}, this.requestOptions, options));
 
@@ -176,16 +185,15 @@ export class HttpAdapter extends AdapterOptions {
    }
 
    authenticate(): Promise<Result> {
-
-     let params = this.bindParams();
-     let url = this.resolve.url(this.url, params);
+     const params = this.bindParams();
+     const url    = this.buildUrl(params);
 
      let options: any = this.requestOptions;
 
-     let callbackBuildParams = this.callbackBuildParams || this.buildParams;
+     const callbackBuildParams = this.callbackBuildParams || this.buildParams;
 
      if (params) {
-       let buildParams = callbackBuildParams.apply(this, [ params ]);
+       const buildParams = callbackBuildParams.apply(this, [ params ]);
        if (options.method.toUpperCase() === 'POST') {
          options.body = buildParams;
        } else if (options.method.toUpperCase() === 'GET') {
@@ -194,20 +202,43 @@ export class HttpAdapter extends AdapterOptions {
      }
 
      return new Promise((resolve: any, reject: any) => {
-       this.http.request(url, options).subscribe((response) => {
-         if (typeof this.callbackResolve === 'function') {
-           resolve(this.callbackResolve.apply(this, [ response ]));
-           return;
-         }
-         resolve(this.createResultSuccess(response));
+       let observable = this.http.request(url, options);
+
+       if (this.timeout) {
+         observable = observable.timeoutWith(this.timeout, Observable.defer(() => {
+           let err = new TimeoutException();
+           return Observable.throw(err);
+         }));
+       }
+
+       observable.subscribe((response) => {
+         this.responseSuccess(response, resolve, reject);
        }, (err: any) => {
-         if (typeof this.callbackReject === 'function') {
-           reject(this.callbackReject.apply(this, [ err ]));
-           return;
-         }
-         reject(this.createResultFailure(err));
+         this.responseError(err, reject);
        });
      });
+   }
+
+   protected responseSuccess(response: any, resolve: any, reject: any) {
+     if (typeof this.callbackResolve === 'function') {
+       const resultSuccess: any = this.callbackResolve.apply(this, [ response ]);
+       this.resultCallback(resultSuccess, resolve, reject);
+       return;
+     }
+
+     const resultSuccess: any = this.createResultSuccess(response);
+     this.resultCallback(resultSuccess, resolve, reject);
+   }
+
+   protected responseError(err: any, reject: any) {
+     if (typeof this.callbackReject === 'function') {
+       const resultError: any = this.callbackReject.apply(this, [ err ]);
+       this.resultCallback(resultError, null, reject);
+       return;
+     }
+
+     const resultError: any = this.createResultFailure(err);
+     this.resultCallback(resultError, null, reject);
    }
 
    protected bindParams(): Object {
@@ -219,8 +250,18 @@ export class HttpAdapter extends AdapterOptions {
      return params;
    }
 
-   protected buildParams(params: any) {
-     let searchParams = new URLSearchParams('');
+   protected buildUrl(params: Object, url?: string): string {
+     url = url || this.url;
+
+     if (this.resolve && this.resolve.getMetadata().has(url)) {
+       url = this.resolve.url(url, params);
+     }
+
+     return url;
+   }
+
+   protected buildParams(params: any): any {
+     const searchParams = new URLSearchParams('');
 
      for (let param in params) {
        searchParams.set(param, params[param]);
@@ -229,11 +270,51 @@ export class HttpAdapter extends AdapterOptions {
      return searchParams;
    }
 
-   protected createResultSuccess(response: any): Result {
+   protected createResultSuccess(response: any): Promise<Result> | Result {
      return new Result(ResultCode.SUCCESS, this.getIdentity(), response.json() || response.body());
    }
 
-   protected createResultFailure(err: any): Result {
+   protected createResultFailure(err: any): Promise<Result> | Result {
      return new Result(ResultCode.FAILURE, null, err);
+   }
+
+   protected resultCallback(result: any, resolve: Function, reject: Function) {
+     if (result instanceof Result) {
+       if (resolve) {
+         resolve(result);
+       }
+
+       if (reject) {
+         reject(result);
+       }
+
+       if (!resolve && !reject) {
+         throw new Error('Need info resolve or reject');
+       }
+
+       return;
+     }
+
+     if (result instanceof Promise) {
+       if (resolve) {
+         result = result.then((data: Result) => {
+          resolve(data);
+        });
+       }
+
+       if (reject) {
+         result.catch((err: Result) => {
+          reject(err);
+        });
+       }
+
+       if (!resolve && !reject) {
+         throw new Error('Need info resolve or reject');
+       }
+
+       return;
+     }
+
+     throw new Error('Return data type error');
    }
 }

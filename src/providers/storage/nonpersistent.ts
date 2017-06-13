@@ -1,26 +1,34 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, OpaqueToken, Optional } from '@angular/core';
 import { Storage, WriteData } from './storage';
 
-const KeyId = '_authnoopersist';
+export const NonPersistentId = '_authlocalstorage';
+
+export const NonPersistentIdToken = new OpaqueToken('NONPERSISTIDTOKEN');
 
 @Injectable()
 export class NonPersistent implements Storage {
 
   private data: any = {};
 
+  constructor(@Optional() @Inject(NonPersistentIdToken) private id?: string) {
+    if (!this.id) {
+      this.id = NonPersistentId;
+    }
+  }
+
   isEmpty(): boolean {
-    return this.data[KeyId] === undefined || this.data[KeyId] === null;
+    return this.data[this.id] === undefined || this.data[this.id] === null;
   }
 
   write(data: WriteData): void {
-    this.data[KeyId] = data;
+    this.data[this.id] = data;
   }
 
   read(): WriteData {
-    return this.data[KeyId];
+    return this.data[this.id];
   }
 
   clear(): void {
-    delete this.data[KeyId];
+    delete this.data[this.id];
   }
 }

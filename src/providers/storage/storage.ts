@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 export interface WriteData {
   identity: string;
   data?: any;
+  dataExtra?: any;
 }
 
 @Injectable()

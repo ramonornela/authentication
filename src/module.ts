@@ -5,47 +5,47 @@ import {
   HttpAdapter,
   HttpAdapterOptionsToken,
   LocalStorage,
+  LocalStorageIdToken,
   NonPersistent,
+  NonPersistentIdToken,
   Storage
 } from './providers';
 
-@NgModule({
-  providers: [
-    Authentication,
-    HttpAdapter,
-    LocalStorage,
-    NonPersistent,
-    { provide: HttpAdapterOptionsToken, useValue: null }
-  ]
-})
+@NgModule()
 export class AuthenticationModule {
   static initialize(adapter?: any, storage?: any): ModuleWithProviders {
     return {
       ngModule: AuthenticationModule,
       providers: [
-        { provide: Adapter, useClass: adapter },
-        { provide: Storage, useClass: storage }
+        Authentication,
+        HttpAdapter,
+        LocalStorage,
+        { provide: LocalStorageIdToken, useValue: null },
+        NonPersistent,
+        { provide: NonPersistentIdToken, useValue: null },
+        { provide: HttpAdapterOptionsToken, useValue: null },
+        { provide: Adapter, useClass: adapter || HttpAdapter },
+        { provide: Storage, useClass: storage || LocalStorage }
       ]
     };
   }
 }
 
-@NgModule({
-  providers: [
-    Authentication,
-    HttpAdapter,
-    LocalStorage,
-    NonPersistent,
-    { provide: Adapter, useClass: HttpAdapter },
-    { provide: HttpAdapterOptionsToken, useValue: null }
-  ]
-})
+@NgModule()
 export class AuthenticationHttpModule {
   static initialize(storage?: any): ModuleWithProviders {
     return {
       ngModule: AuthenticationModule,
       providers: [
-        { provide: Storage, useClass: storage }
+        Authentication,
+        HttpAdapter,
+        LocalStorage,
+        { provide: LocalStorageIdToken, useValue: null },
+        NonPersistent,
+        { provide: NonPersistentIdToken, useValue: null },
+        { provide: Adapter, useClass: HttpAdapter },
+        { provide: HttpAdapterOptionsToken, useValue: null },
+        { provide: Storage, useClass: storage || LocalStorage },
       ]
     };
   }

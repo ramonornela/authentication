@@ -8,7 +8,12 @@ export enum ResultCode {
 };
 
 export class Result {
-  constructor(private code: number, private identity?: any, private data?: Object) {}
+  constructor(
+    private code: number,
+    private identity?: any,
+    private data?: Object,
+    private dataExtra?: any
+  ) {}
 
   isValid() {
     return this.code > 0;
@@ -16,6 +21,10 @@ export class Result {
 
   getData() {
     return this.data;
+  }
+
+  getExtra() {
+    return this.dataExtra;
   }
 
   getCode(): number {

@@ -49,7 +49,8 @@ export class Authentication {
         if (result.isValid()) {
           this.getStorage().write({
             identity: result.getIdentity(),
-            data: result.getData()
+            data: result.getData(),
+            dataExtra: result.getExtra()
           });
           resolve(result);
         }
@@ -86,5 +87,15 @@ export class Authentication {
     }
 
     return storage.read().data;
+  }
+
+  getDataExtra() {
+    let storage = this.getStorage();
+
+    if (storage.isEmpty()) {
+      return;
+    }
+
+    return storage.read().dataExtra;
   }
 }
